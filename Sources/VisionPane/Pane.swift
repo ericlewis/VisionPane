@@ -102,7 +102,7 @@ struct AuxiliaryPane: View {
     let padding: CGFloat = 20
     var width: CGFloat = 320
     
-    var paneController: UIHostingController<AuxiliaryPane>?
+    var paneController: UIHostingController<AnyView>
     var mainController: UIHostingController<AnyView>
     
     var panes: [PanePreferenceData] = []
@@ -117,10 +117,10 @@ struct AuxiliaryPane: View {
     
     init<C: View>(rootView: C) {
         self.mainController = UIHostingController(rootView: AnyView(EmptyView()))
+        self.paneController = UIHostingController(rootView: AnyView(EmptyView()))
         super.init(nibName: nil, bundle: nil)
         self.addChildViewController(self.mainController)
-        self.paneController = UIHostingController(rootView: .init(model: self, view: AnyView(EmptyView())))
-        self.addChildViewController(self.paneController!)
+        self.addChildViewController(self.paneController)
     }
     
     required init?(coder: NSCoder) {
@@ -147,8 +147,10 @@ struct AuxiliaryPane: View {
     private func handlePreferenceChange(_ preferences: [PanePreferenceData]) {
         if let pane = preferences.last(where: { $0.presented }) {
             let rootView = AnyView(pane.view.environment(\._dismissPane, DismissPaneAction(isPresented: pane.binding)))
-            self.paneController?.rootView = AuxiliaryPane(model: self, view: rootView)
-            self.isShowingBothPanes = true
+            self.paneController.rootView = AnyView(AuxiliaryPane(model: self, view: rootView))
+            DispatchQueue.main.asyncAfter(deadline: .now()) {
+                self.isShowingBothPanes = true
+            }
         } else if !preferences.isEmpty {
             self.isShowingBothPanes = false
         }
@@ -166,7 +168,7 @@ struct AuxiliaryPane: View {
     private func adjustSubviewFrames() {
         let division = view.bounds.divided(atDistance: width + padding, from: .maxXEdge)
         mainController.view.frame = isShowingBothPanes ? division.remainder : view.bounds
-        paneController?.view.frame = division.slice.divided(atDistance: padding, from: .minXEdge).remainder
+        paneController.view.frame = division.slice.divided(atDistance: padding, from: .minXEdge).remainder
     }
     
     public override func viewDidLayoutSubviews() {
@@ -226,7 +228,7 @@ extension View {
     ///             }
     ///         }
     ///     }
-    ///     
+    ///
     /// - Parameters:
     ///   - isPresented: A binding to a Boolean value that determines whether
     ///     to present the pane that you create in the modifier's
