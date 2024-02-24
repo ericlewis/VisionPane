@@ -28,14 +28,14 @@ struct PanePreferenceKey: PreferenceKey {
 }
 
 public struct DismissPaneAction {
-    var callback: () -> Void
+    let isPresented: Binding<Bool>
     func callAsFunction() {
-        callback()
+        isPresented.wrappedValue = false
     }
 }
 
 struct DismissPaneActionKey: EnvironmentKey {
-    static let defaultValue = DismissPaneAction(callback: {})
+    static let defaultValue = DismissPaneAction(isPresented: .constant(false))
 }
 
 extension EnvironmentValues {
@@ -146,7 +146,7 @@ struct AuxiliaryPane: View {
     
     private func handlePreferenceChange(_ preferences: [PanePreferenceData]) {
         if let pane = preferences.last(where: { $0.presented }) {
-            let rootView = AnyView(pane.view.environment(\._dismissPane, DismissPaneAction { pane.binding.wrappedValue = false }))
+            let rootView = AnyView(pane.view.environment(\._dismissPane, DismissPaneAction(isPresented: pane.binding)))
             self.paneController?.rootView = AuxiliaryPane(model: self, view: rootView)
             self.isShowingBothPanes = true
         } else if !preferences.isEmpty {
