@@ -27,7 +27,8 @@ struct PaneView: View {
     }
 }
 
-struct ContentView: View {
+
+struct NewWindowView: View {
     
     @State
     private var isPanePresented = false
@@ -37,6 +38,32 @@ struct ContentView: View {
             List {
                 Button("Toggle Pane") {
                     isPanePresented.toggle()
+                }
+            }
+            .navigationTitle("New Window")
+        }
+        .pane(isPresented: $isPanePresented) {
+            PaneView()
+        }
+    }
+}
+
+struct ContentView: View {
+    
+    @State
+    private var isPanePresented = false
+    
+    @Environment(\.openWindow)
+    var openWindow
+    
+    var body: some View {
+        NavigationStack {
+            List {
+                Button("Toggle Pane") {
+                    isPanePresented.toggle()
+                }
+                Button("Open New Window") {
+                    openWindow(id: "new-window")
                 }
             }
             .navigationTitle("Main")
@@ -51,6 +78,10 @@ struct ContentView: View {
 struct ExampleApp: App {
     var body: some Scene {
         WindowGroup.Pane {
+            ContentView()
+        }
+        // Panes extend normal WindowGroup
+        WindowGroup.Pane(id: "new-window") {
             ContentView()
         }
     }
