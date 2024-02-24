@@ -231,7 +231,6 @@ extension View {
     ///   - isPresented: A binding to a Boolean value that determines whether
     ///     to present the pane that you create in the modifier's
     ///     `content` closure.
-    ///   - onDismiss: The closure to execute when dismissing the pane.
     ///   - content: A closure that returns the content of the pane.
     public func pane<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
         modifier(PanePresentationViewModifier(isPresented: isPresented, view: content))
