@@ -39,6 +39,7 @@ struct ContentView: View {
                     isPanePresented.toggle()
                 }
             }
+            .navigationTitle("Main")
         }
         .pane(isPresented: $isPanePresented) {
             PaneView()
