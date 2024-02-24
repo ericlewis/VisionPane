@@ -186,6 +186,46 @@ public struct PaneProvider<Content: View>: UIViewControllerRepresentable {
 }
 
 extension View {
+    
+    /// Presents a pane when a binding to a Boolean value that you
+    /// provide is true.
+    ///
+    /// Use this method when you want to present a pane view to the
+    /// user when a Boolean value you provide is true. The example
+    /// below displays a pane view of the mockup for a software license
+    /// agreement when the user toggles the `isShowingPane` variable by
+    /// clicking or tapping on the "Show License Agreement" button:
+    ///
+    ///     struct ShowLicenseAgreement: View {
+    ///         @State private var isShowingSheet = false
+    ///         var body: some View {
+    ///             Button(action: {
+    ///                 isShowingPane.toggle()
+    ///             }) {
+    ///                 Text("Show License Agreement")
+    ///             }
+    ///             .pane(isPresented: $isShowingPane) {
+    ///                 VStack {
+    ///                     Text("License Agreement")
+    ///                         .font(.title)
+    ///                         .padding(50)
+    ///                     Text("""
+    ///                             Terms and conditions go here.
+    ///                         """)
+    ///                         .padding(50)
+    ///                     Button("Dismiss",
+    ///                            action: { isShowingPane.toggle() })
+    ///                 }
+    ///             }
+    ///         }
+    ///     }
+    ///     
+    /// - Parameters:
+    ///   - isPresented: A binding to a Boolean value that determines whether
+    ///     to present the pane that you create in the modifier's
+    ///     `content` closure.
+    ///   - onDismiss: The closure to execute when dismissing the pane.
+    ///   - content: A closure that returns the content of the pane.
     public func pane<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: () -> Content) -> some View {
         modifier(PanePresentationViewModifier(isPresented: isPresented, view: content()))
     }
