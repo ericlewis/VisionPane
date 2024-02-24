@@ -105,8 +105,6 @@ struct AuxiliaryPane: View {
     var paneController: UIHostingController<AnyView>
     var mainController: UIHostingController<AnyView>
     
-    var panes: [PanePreferenceData] = []
-    
     var isShowingBothPanes = false {
         didSet {
             if oldValue != isShowingBothPanes {
