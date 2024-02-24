@@ -2,13 +2,20 @@ import UIKit
 import SwiftUI
 
 struct PanePreferenceData: Equatable {
-    let namespace: Namespace.ID
+    let id: UUID
     let binding: Binding<Bool>
     var presented: Bool
     let view: AnyView
     
+    init<C: View>(id: UUID, binding: Binding<Bool>, presented: Bool, view: @escaping () -> C) {
+        self.id = id
+        self.binding = binding
+        self.presented = presented
+        self.view = AnyView(view())
+    }
+    
     static func == (lhs: PanePreferenceData, rhs: PanePreferenceData) -> Bool {
-        lhs.namespace == rhs.namespace && lhs.binding.wrappedValue == rhs.binding.wrappedValue && lhs.presented == rhs.presented
+        lhs.id == rhs.id && lhs.binding.wrappedValue == rhs.binding.wrappedValue && lhs.presented == rhs.presented
     }
 }
 
@@ -44,12 +51,12 @@ extension EnvironmentValues {
     }
 }
 
-struct PanePresentationViewModifier<PaneContent: View>: ViewModifier {
+struct PanePresentationViewModifier<C: View>: ViewModifier {
     
     @Binding
     var isPresented: Bool
     
-    var view: PaneContent
+    var view: () -> C
  
     @Environment(\.dismissPane)
     private var dismissPane
@@ -65,10 +72,10 @@ struct PanePresentationViewModifier<PaneContent: View>: ViewModifier {
                         key: PanePreferenceKey.self,
                         value: [
                             PanePreferenceData(
-                                namespace: id,
+                                id: .init(),
                                 binding: $isPresented,
                                 presented: isPresented,
-                                view: AnyView(view)
+                                view: view
                             )
                         ])
             }
@@ -226,7 +233,7 @@ extension View {
     ///     `content` closure.
     ///   - onDismiss: The closure to execute when dismissing the pane.
     ///   - content: A closure that returns the content of the pane.
-    public func pane<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: () -> Content) -> some View {
-        modifier(PanePresentationViewModifier(isPresented: isPresented, view: content()))
+    public func pane<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
+        modifier(PanePresentationViewModifier(isPresented: isPresented, view: content))
     }
 }
