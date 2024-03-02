@@ -29,7 +29,7 @@ struct PanePreferenceKey: PreferenceKey {
 
 public struct DismissPaneAction {
     let isPresented: Binding<Bool>
-    func callAsFunction() {
+    public func callAsFunction() {
         isPresented.wrappedValue = false
     }
 }
