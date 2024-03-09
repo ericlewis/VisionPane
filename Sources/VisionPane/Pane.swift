@@ -183,6 +183,10 @@ public struct PaneProvider<Content: View>: UIViewControllerRepresentable {
     
     var content: Content
     
+    public init(content: () -> Content) {
+        self.content = content()
+    }
+    
     public func makeUIViewController(context: Context) -> DualPaneViewController {
         DualPaneViewController(rootView: content)
     }
