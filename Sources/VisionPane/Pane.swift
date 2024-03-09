@@ -183,7 +183,7 @@ public struct PaneProvider<Content: View>: UIViewControllerRepresentable {
     
     var content: Content
     
-    public init(content: () -> Content) {
+    public init(@ViewBuilder content: () -> Content) {
         self.content = content()
     }
     
